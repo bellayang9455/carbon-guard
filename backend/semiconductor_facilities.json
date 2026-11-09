@@ -1,0 +1,697 @@
+[
+  {
+    "controlno": "J6300959",
+    "supplier": "世界先進積體電路股份有限公司晶圓一廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H46B0495",
+    "supplier": "世界先進積體電路股份有限公司晶圓三廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1751197",
+    "supplier": "世界先進積體電路股份有限公司晶圓二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17N5463",
+    "supplier": "世界先進積體電路股份有限公司晶圓五廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H4903093",
+    "supplier": "中華科盛德光罩股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6304706",
+    "supplier": "亞太優勢微系統股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "K7195124",
+    "supplier": "京元電子股份有限公司竹南分公司中華廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "K77A0619",
+    "supplier": "京元電子股份有限公司銅鑼分公司廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1700798",
+    "supplier": "元隆電子股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J59A7436",
+    "supplier": "力成科技股份有限公司3C廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J59A0579",
+    "supplier": "力成科技股份有限公司大同廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J59B1009",
+    "supplier": "力成科技股份有限公司文化一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J59B1316",
+    "supplier": "力成科技股份有限公司新興廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O17N2439",
+    "supplier": "力成科技股份有限公司竹科三廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17K9082",
+    "supplier": "力成科技股份有限公司竹科分公司",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1753306",
+    "supplier": "力晶積成電子製造股份有限公司8A",
+    "industry": "2611"
+  },
+  {
+    "controlno": "K71A8772",
+    "supplier": "力晶積成電子製造股份有限公司8B",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17M3925",
+    "supplier": "力晶積成電子製造股份有限公司P1／2",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17M3896",
+    "supplier": "力晶積成電子製造股份有限公司P3",
+    "industry": "2611"
+  },
+  {
+    "controlno": "K77A1855",
+    "supplier": "力晶積成電子製造股份有限公司P5",
+    "industry": "2611"
+  },
+  {
+    "controlno": "F1606662",
+    "supplier": "南亞科技股份有限公司三廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0300727",
+    "supplier": "南茂科技股份有限公司台南二廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "R0301514",
+    "supplier": "南茂科技股份有限公司台南廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J59B0259",
+    "supplier": "南茂科技股份有限公司湖口一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J5501121",
+    "supplier": "南茂科技股份有限公司竹北廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J6300860",
+    "supplier": "南茂科技股份有限公司竹科一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1713197",
+    "supplier": "台亞半導體股份有限公司力行廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "P58A5558",
+    "supplier": "台塑勝高科技股份有限公司麥寮矽晶圓二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "P5801871",
+    "supplier": "台塑勝高科技股份有限公司麥寮矽晶圓廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "G38A0540",
+    "supplier": "台灣半導體股份有限公司利澤廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E4900397",
+    "supplier": "台灣恩智浦半導體股份有限公司",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A6412",
+    "supplier": "台灣福雷電子股份有限公司三廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "L95A2041",
+    "supplier": "台灣積體電路製造股份有限公司15廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6301107",
+    "supplier": "台灣積體電路製造股份有限公司三廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6300324",
+    "supplier": "台灣積體電路製造股份有限公司三廠3E廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A4298",
+    "supplier": "台灣積體電路製造股份有限公司二十廠一期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6300557",
+    "supplier": "台灣積體電路製造股份有限公司二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6301447",
+    "supplier": "台灣積體電路製造股份有限公司五廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H50A6430",
+    "supplier": "台灣積體電路製造股份有限公司先進封測三廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "R90A1360",
+    "supplier": "台灣積體電路製造股份有限公司先進封測二廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "D9006435",
+    "supplier": "台灣積體電路製造股份有限公司先進封測二廠二期",
+    "industry": "2613"
+  },
+  {
+    "controlno": "B9503479",
+    "supplier": "台灣積體電路製造股份有限公司先進封測五廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "K71B2355",
+    "supplier": "台灣積體電路製造股份有限公司先進封測六B廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "K71B0795",
+    "supplier": "台灣積體電路製造股份有限公司先進封測六廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1713311",
+    "supplier": "台灣積體電路製造股份有限公司八廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "R9004230",
+    "supplier": "台灣積體電路製造股份有限公司六廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1709308",
+    "supplier": "台灣積體電路製造股份有限公司十二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A1670",
+    "supplier": "台灣積體電路製造股份有限公司十二廠七期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A3567",
+    "supplier": "台灣積體電路製造股份有限公司十二廠八期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A1591",
+    "supplier": "台灣積體電路製造股份有限公司十二廠六期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A1056",
+    "supplier": "台灣積體電路製造股份有限公司十二廠四期五期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A0107",
+    "supplier": "台灣積體電路製造股份有限公司十二廠研新廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "B23B6125",
+    "supplier": "台灣積體電路製造股份有限公司十五B廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0402208",
+    "supplier": "台灣積體電路製造股份有限公司十八廠一期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0403492",
+    "supplier": "台灣積體電路製造股份有限公司十八廠七期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0402431",
+    "supplier": "台灣積體電路製造股份有限公司十八廠二期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0402824",
+    "supplier": "台灣積體電路製造股份有限公司十八廠五期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D9008466",
+    "supplier": "台灣積體電路製造股份有限公司十八廠八期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0402815",
+    "supplier": "台灣積體電路製造股份有限公司十八廠六期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0402833",
+    "supplier": "台灣積體電路製造股份有限公司十八廠四期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D9000746",
+    "supplier": "台灣積體電路製造股份有限公司十四B廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "R9001677",
+    "supplier": "台灣積體電路製造股份有限公司十四廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D9001396",
+    "supplier": "台灣積體電路製造股份有限公司十四廠七期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D9007601",
+    "supplier": "台灣積體電路製造股份有限公司十四廠八期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0402904",
+    "supplier": "台灣積體電路製造股分有限公司18廠三期",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H4889454",
+    "supplier": "台灣美光晶圓科技股份有限公司一廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H4888582",
+    "supplier": "台灣美光晶圓科技股份有限公司二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "L9202099",
+    "supplier": "台灣美光記憶體股份有限公司台中一廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "B9205905",
+    "supplier": "台灣美光記憶體股份有限公司台中三廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "B9202664",
+    "supplier": "台灣美光記憶體股份有限公司台中二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1704812",
+    "supplier": "台灣茂矽電子股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "F0500803",
+    "supplier": "台灣通用器材股份有限公司",
+    "industry": "2612"
+  },
+  {
+    "controlno": "H50A1985",
+    "supplier": "合晶科技股份有限公司龍潭廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "R0301603",
+    "supplier": "宏捷科技股份有限公司南科大利廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "F0401403",
+    "supplier": "德州儀器工業股份有限公司",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1745831",
+    "supplier": "敦南科技股份有限公司新竹分公司廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17A0968",
+    "supplier": "新唐科技股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H43C1277",
+    "supplier": "日月光半導體製造股份有限公司中壢分公司封測七廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "H43A0700",
+    "supplier": "日月光半導體製造股份有限公司中壢分公司封測五廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "H43C1811",
+    "supplier": "日月光半導體製造股份有限公司中壢分公司封測八廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "H43B3840",
+    "supplier": "日月光半導體製造股份有限公司中壢分公司封測六廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "H43A2093",
+    "supplier": "日月光半導體製造股份有限公司中壢分公司封測四廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E4905365",
+    "supplier": "日月光半導體製造股份有限公司九廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A5692",
+    "supplier": "日月光半導體製造股份有限公司二十一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A6630",
+    "supplier": "日月光半導體製造股份有限公司二十二廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A9852",
+    "supplier": "日月光半導體製造股份有限公司二十四廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A7579",
+    "supplier": "日月光半導體製造股份有限公司五廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E4906246",
+    "supplier": "日月光半導體製造股份有限公司凸晶二廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E4906835",
+    "supplier": "日月光半導體製造股份有限公司十一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A5078",
+    "supplier": "日月光半導體製造股份有限公司十二廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1706307",
+    "supplier": "旺宏電子股份有限公司晶圓二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17A6887",
+    "supplier": "旺宏電子股份有限公司晶圓五廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1706923",
+    "supplier": "昇陽國際半導體(股)公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "B9110385",
+    "supplier": "昇陽國際半導體股份有限公司中港廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J59A5024",
+    "supplier": "晶兆成科技股份有限公司一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J59B2542",
+    "supplier": "晶兆成科技股份有限公司二廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O17M3787",
+    "supplier": "晶成半導體股份有限公司竹科廠",
+    "industry": "2612"
+  },
+  {
+    "controlno": "J5909010",
+    "supplier": "欣銓科技股份有限公司新工一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J6300146",
+    "supplier": "漢磊科技股份有限公司創新廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1701115",
+    "supplier": "漢磊科技股份有限公司研新廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6300299",
+    "supplier": "漢磊科技股份有限公司研發廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J6301090",
+    "supplier": "環球晶圓股份有限公司中德廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O17N8209",
+    "supplier": "盧森堡商達爾國際股份有限公司新竹分公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "L9402188",
+    "supplier": "矽品精密工業股份有限公司中山廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "N14A3583",
+    "supplier": "矽品精密工業股份有限公司中科分公司二林廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "B9502212",
+    "supplier": "矽品精密工業股份有限公司中科廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "L9401476",
+    "supplier": "矽品精密工業股份有限公司大豐廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "N0911075",
+    "supplier": "矽品精密工業股份有限公司彰化廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J63A1422",
+    "supplier": "矽品精密工業股份有限公司新竹分公司三廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1707162",
+    "supplier": "矽格聯測股份有限公司",
+    "industry": "2613"
+  },
+  {
+    "controlno": "J59A1389",
+    "supplier": "矽格股份有限公司湖口廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "P4602196",
+    "supplier": "福懋科技股份有限公司",
+    "industry": "2613"
+  },
+  {
+    "controlno": "H4886999",
+    "supplier": "穩懋半導體股份有限公司華亞二廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H4806348",
+    "supplier": "穩懋半導體股份有限公司華亞廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H48B0554",
+    "supplier": "穩懋半導體股份有限公司龜山廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A1719",
+    "supplier": "聯穎光電股份有限公司竹科廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "R0304131",
+    "supplier": "聯華電子股份有限公司Fab12A廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "D0302141",
+    "supplier": "聯華電子股份有限公司Fab12A廠第二廠區",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1706209",
+    "supplier": "聯華電子股份有限公司Fab8A廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1709148",
+    "supplier": "聯華電子股份有限公司Fab8D廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1706692",
+    "supplier": "聯華電子股份有限公司Fab8E廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "O1708632",
+    "supplier": "聯華電子股份有限公司Fab8F廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J63A0048",
+    "supplier": "聯華電子股份有限公司Fab8S廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J5905432",
+    "supplier": "艾克爾先進科技股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J5909814",
+    "supplier": "艾克爾國際科技股份有限公司新竹廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "H5001589",
+    "supplier": "艾克爾國際科技股份有限公司龍潭廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E5402523",
+    "supplier": "華東科技股份有限公司B10廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E49A1492",
+    "supplier": "華泰電子股份有限公司經三廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "L9506056",
+    "supplier": "華邦電子股份有限公司中科廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "E2903416",
+    "supplier": "華邦電子股份有限公司高雄廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "L9401467",
+    "supplier": "菱生精密工業股份有限公司一廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "K7103046",
+    "supplier": "超豐電子股份有限公司公義廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "K72A4864",
+    "supplier": "超豐電子股份有限公司頭份廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J59A1577",
+    "supplier": "辛耘企業股份有限公司",
+    "industry": "2611"
+  },
+  {
+    "controlno": "H50B4708",
+    "supplier": "采鈺科技股份有限公司龍潭廠",
+    "industry": "2611"
+  },
+  {
+    "controlno": "J59B0675",
+    "supplier": "頎邦科技股份有限公司光復廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "E54A1352",
+    "supplier": "頎邦科技股份有限公司南六廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O1747924",
+    "supplier": "頎邦科技股份有限公司展業廠",
+    "industry": "2613"
+  },
+  {
+    "controlno": "O17N6560",
+    "supplier": "鴻揚半導體股份有限公司",
+    "industry": "2611"
+  }
+]

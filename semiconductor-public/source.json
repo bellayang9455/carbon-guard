@@ -1,0 +1,82 @@
+{
+  "dataset": "GHG_P_01",
+  "source": "https://data.gov.tw/dataset/16059",
+  "retrieved_at_utc": "2026-11-08T14:10:54.372147+00:00",
+  "downloaded_rows": 4255,
+  "semiconductor_rows": 874,
+  "codes": [
+    "2611",
+    "2612",
+    "2613"
+  ],
+  "pages": [
+    {
+      "offset": 0,
+      "rows": 1000,
+      "sha256": "6dad1ecc725a3849c05d822fa2b08243a805b7416b6f1bf83f8fce704890f6c8"
+    },
+    {
+      "offset": 1000,
+      "rows": 1000,
+      "sha256": "65487906e68dd9624b45b74106bccde6629c9df78ce065eab23348735a817305"
+    },
+    {
+      "offset": 2000,
+      "rows": 1000,
+      "sha256": "a0d8089b92f973e90a29650defe3a5c5fa13f9021a89cf52342f423c4843b853"
+    },
+    {
+      "offset": 3000,
+      "rows": 1000,
+      "sha256": "1b0c8ce0ab2d95f448f27c5c146ce039fdd290abb1f6806e75d10c249c4f1487"
+    },
+    {
+      "offset": 4000,
+      "rows": 255,
+      "sha256": "8bd16e8311f0ac139b28b3796669eb6b32365739f733ad4cdb791e3a3dd6dabe"
+    }
+  ],
+  "year_counts": {
+    "113": 138,
+    "112": 132,
+    "111": 125,
+    "110": 61,
+    "109": 59,
+    "108": 56,
+    "107": 56,
+    "106": 54,
+    "105": 50,
+    "104": 49,
+    "103": 44,
+    "102": 42,
+    "96": 2,
+    "95": 1,
+    "94": 1,
+    "101": 1,
+    "100": 1,
+    "99": 2
+  },
+  "industry_counts": {
+    "2613": 177,
+    "2611": 691,
+    "2612": 6
+  },
+  "clean_rows": 270,
+  "excluded_rows": 604,
+  "exclusion_reasons": {
+    "invalid_or_missing_tot1_value": 604,
+    "industry_code_name_mismatch": 1,
+    "invalid_or_missing_tot2_value": 479,
+    "invalid_or_missing_tot_value": 479,
+    "not_verified": 5
+  },
+  "clean_industry_counts": {
+    "2613": 105,
+    "2611": 161,
+    "2612": 4
+  },
+  "clean_year_counts": {
+    "113": 138,
+    "112": 132
+  }
+}

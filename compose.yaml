@@ -1,0 +1,16 @@
+services:
+  carbon-guard:
+    build: .
+    env_file: .env
+    environment:
+      CARBON_DATA_DIR: /app/data
+      CARBON_HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - carbon-data:/app/data
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  carbon-data:
