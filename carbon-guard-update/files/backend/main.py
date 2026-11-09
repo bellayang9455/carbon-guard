@@ -118,11 +118,18 @@ def logout(request: Request, response: Response, user=Depends(current_user)):
     return {'ok': True}
 
 def visible_records(db, user):
+    latest = {}
+    for event_row in db.execute('SELECT payload FROM audit ORDER BY id DESC'):
+        event_value = json.loads(event_row['payload'])
+        if event_value.get('action') == 'review':
+            number = event_value['detail']['record_id']
+            if number not in latest:
+                latest[number] = {'decision': event_value['detail']['decision'], 'note': event_value['detail']['note'], 'reviewed_by': event_value['user'], 'reviewed_at': event_value['time']}
     rows = []
     for row in db.execute('SELECT id,payload,digest FROM records ORDER BY id DESC'):
         value = json.loads(row['payload'])
         if user['role'] == 'admin' or value['supplier'] == user['supplier']:
-            rows.append({'id': row['id'], **value, 'hash': row['digest']})
+            rows.append({'id': row['id'], **value, 'hash': row['digest'], 'review': latest.get(row['id'])})
     return rows
 
 @app.get('/api/records')

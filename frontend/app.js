@@ -1,97 +1,83 @@
 'use strict';
-const $ = s => document.querySelector(s);
-const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-let user, page = 'overview', records = [], total = 0, offset = 0, model = {}, search = '', state = 'all';
-const titles = {overview:'碳數據，安心掌握。',records:'每一筆排放，都有依據。',ai:'AI 異常偵測',integrity:'資料完整性驗證',security:'資安防護與稽核'};
-async function api(path, options = {}) {
-  const headers = {...options.headers};
-  if (options.body) headers['Content-Type'] = 'application/json';
-  if (user?.csrf) headers['X-CSRF-Token'] = user.csrf;
-  const response = await fetch('/api' + path, {...options, headers, credentials:'same-origin'});
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    if (response.status === 401 && path !== '/login') showLogin();
-    throw Error(typeof error.detail === 'string' ? error.detail : JSON.stringify(error.detail || '操作失敗'));
-  }
-  if (path === '/export') return response.blob();
-  return response.json();
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let user,page='records',period='annual',offset=0,rows=[],total=0,query='',filter='all',facilities=[],annualModel={},monthlyModel={};
+const titles={records:'資料管理',models:'模型管理',integrity:'完整性驗證',settings:'管理設定'};
+const isAdmin=()=>user?.role==='admin';
+const base=()=>period==='annual'?'/semiconductor':'';
+function toast(s){$('#toast').textContent=s;$('#toast').hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>$('#toast').hidden=true,5000);}
+async function api(path,body){const response=await fetch('/api'+path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json','X-CSRF-Token':user?.csrf||''}:{},body:body?JSON.stringify(body):undefined});const value=await response.json().catch(()=>({}));if(!response.ok){if(response.status===401&&path!='/login')showLogin();throw Error(typeof value.detail==='string'?value.detail:JSON.stringify(value.detail||'操作失敗'));}return value;}
+async function action(fn,button,modal=false){if(button)button.disabled=true;try{await fn();}catch(e){if(modal)$('#modal-error').textContent=e.message;else toast(e.message);}finally{if(button)button.disabled=false;}}
+function showLogin(){user=null;$('#modal').close();$('#app').hidden=true;$('#login-view').hidden=false;}
+function aiTag(r){return r.anomaly===null?'<span class="tag muted">尚未評分</span>':`<span class="tag ${r.anomaly?'warn':''}">${r.anomaly?'待人工覆核':'正常範圍'}</span>`;}
+function humanTag(r){const labels={confirmed:'確認合理',rejected:'已退回',pending:'待查證'};return r.review?`<span class="tag ${r.review.decision==='confirmed'?'':'warn'}">${labels[r.review.decision]}</span>`:(r.anomaly?'尚未覆核':'—');}
+async function enter(){page='records';period='annual';offset=0;query='';filter='all';$('#login-view').hidden=true;$('#app').hidden=false;$('#identity').textContent=user.username+'｜'+(isAdmin()?'管理員':user.supplier);document.querySelectorAll('.admin-only').forEach(el=>el.hidden=!isAdmin());await render();}
+function shell(){
+ $('#page-title').textContent=titles[page];document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));document.querySelectorAll('[data-period]').forEach(b=>b.classList.toggle('active',b.dataset.period===period));$('#data-actions').hidden=page!=='records';$('#period-tabs').hidden=!['records','models'].includes(page);$('#import-data').hidden=period==='annual'&&!isAdmin();
 }
-function toast(message) { $('#toast').textContent = message; $('#toast').hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => $('#toast').hidden = true, 5000); }
-function showLogin() {user = null;$('#app').hidden = true;$('#login-view').hidden = false;}
-async function enter() {
-  $('#login-view').hidden = true;$('#app').hidden = false;
-  $('#identity').textContent = `${user.username}｜${user.role === 'admin' ? '管理員' : user.supplier}`;
-  document.querySelectorAll('.admin-only').forEach(el => el.hidden = user.role !== 'admin');
-  page = 'overview'; offset = 0; await refresh();
+async function render(){shell();const expected=page,expectedPeriod=period;$('#content').innerHTML='<p class="loading" role="status">載入中…</p>';let html;
+ if(page==='records'){
+  const data=await api(base()+'/records?offset='+offset+'&limit=20');if(page!==expected||period!==expectedPeriod)return;rows=data.records.slice(0,20);total=data.total;
+  html=`<div class="card"><div class="toolbar"><input id="search" value="${esc(query)}" placeholder="搜尋本頁供應商或編號" aria-label="搜尋本頁"><select id="filter" aria-label="AI 狀態"><option value="all">全部狀態</option><option value="anomaly" ${filter==='anomaly'?'selected':''}>待人工覆核</option><option value="normal" ${filter==='normal'?'selected':''}>正常範圍</option></select><button id="export" class="secondary">匯出全部</button><small id="record-count"></small></div><div class="tablewrap"><table><thead><tr><th>編號／供應商</th><th>${period==='annual'?'年度':'月份'}</th><th>${period==='annual'?'直接排放':'排放量'} (tCO₂e)</th><th>${period==='annual'?'間接排放 (tCO₂e)':'產量'}</th><th>AI 偵測</th><th>人工覆核</th><th>操作</th></tr></thead><tbody id="record-rows"></tbody></table></div><div class="pager"><span id="range"></span><button id="prev" class="secondary">上一頁</button><button id="next" class="secondary">下一頁</button></div></div>`;
+ }else if(page==='models'){
+  if(!isAdmin())throw Error('需要管理員權限');const m=await api(period==='annual'?'/semiconductor/model':'/model');if(page!==expected||period!==expectedPeriod)return;
+  html=period==='annual'?`<div class="card"><h2>年度模型</h2><p>${m.loaded?`${esc(m.industry)} · ${m.train_year} 年`:'尚未載入'}</p><form id="model-import"><label>模型 JSON<input id="model-file" type="file" accept=".json" required></label><button>載入模型</button></form></div>`:`<div class="card"><h2>月份模型</h2><p>${m.trained?'已就緒':'尚未訓練'}</p><form id="model-train"><label>訓練 CSV<input id="train-file" type="file" accept=".csv" required></label><label>預期離群比例<input id="contamination" type="number" value="0.05" min="0.001" max="0.5" step="0.001" required></label><label>訓練備註<textarea id="training-note" maxlength="500" required></textarea></label><small>32–10,000 筆，2 MB 以內。</small><button>開始訓練</button></form></div>`;
+ }else if(page==='integrity')html='<div class="card"><h2>資料完整性</h2><p>檢查資料內容、紀錄順序與驗證碼。</p><button id="verify">執行驗證</button><div id="verification" aria-live="polite"></div></div>';
+ else if(page==='settings'){
+  const [accounts,allFacilities]=await Promise.all([api('/semiconductor/supplier-accounts'),api('/semiconductor/facilities')]);if(page!==expected)return;facilities=allFacilities;
+  html=`<div class="card"><h2>供應商廠別設定</h2><form id="binding-form"><label>供應商帳號<select id="binding-user" required><option value="">請選擇帳號</option>${accounts.map(a=>`<option value="${esc(a.username)}" data-supplier="${esc(a.supplier)}">${esc(a.username)}</option>`).join('')}</select></label><p id="binding-current"></p><label>所屬廠別<select id="binding-facility" required>${facilityOptions(facilities)}</select></label><small>儲存後會變更帳號的資料存取範圍，該供應商需重新登入。</small><button ${accounts.length?'':'disabled'}>儲存綁定</button></form></div><div class="card"><div class="heading"><h2>操作紀錄</h2><button id="load-audit" class="secondary">讀取紀錄</button></div><div id="audit-output"></div></div>`;
+ }
+ if(page!==expected||period!==expectedPeriod&&['models','records'].includes(page))return;$('#content').innerHTML=html;bindPage();if(page==='records')drawRows();
 }
-async function refresh() {
-  const [data, info] = await Promise.all([api(`/records?limit=100&offset=${offset}`), api('/model')]);
-  records = data.records; total = data.total; model = info; render();
+function drawRows(){const visible=rows.filter(r=>(!query||r.supplier.includes(query)||String(r.id).includes(query))&&(filter==='all'||(filter==='anomaly'?r.anomaly===true:r.anomaly===false)));$('#record-rows').innerHTML=visible.map(r=>`<tr><td>#${r.id} ${esc(r.supplier)}</td><td>${esc(period==='annual'?r.year:r.month)}</td><td>${period==='annual'?r.direct:r.emission}</td><td>${period==='annual'?r.indirect:r.production}</td><td>${aiTag(r)}</td><td>${humanTag(r)}</td><td><button data-id="${r.id}" class="secondary">${isAdmin()?'檢視／覆核':'檢視'}</button></td></tr>`).join('')||'<tr><td colspan="7">沒有符合條件的紀錄</td></tr>';$('#record-count').textContent='共 '+total+' 筆';$('#range').textContent=rows.length?`${offset+1}–${offset+rows.length} 筆`:'0 筆';$('#prev').disabled=offset===0;$('#next').disabled=offset+rows.length>=total;document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>showDetail(rows.find(r=>r.id===+b.dataset.id)));}
+function openModal(title,html){$('#modal-title').textContent=title;$('#modal-content').innerHTML=html;$('#modal-error').textContent='';if(!$('#modal').open)$('#modal').showModal();}
+function showDetail(row){
+ const fields=period==='annual'?[['供應商',row.supplier],['廠別',row.controlno],['年度',row.year],['行業',row.industry],['直接排放',row.direct+' tCO₂e'],['間接排放',row.indirect+' tCO₂e']]:[['供應商',row.supplier],['月份',row.month],['範疇',row.scope],['排放量',row.emission+' tCO₂e'],['產量',row.production]];
+ openModal('紀錄詳情',`<dl class="record-fields">${fields.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl><p>AI 偵測：${aiTag(row)}</p><p>人工覆核：${humanTag(row)}</p>${row.review?`<p>覆核說明：${esc(row.review.note)}</p><small>${esc(row.review.reviewed_by)} · ${time(row.review.reviewed_at)}</small>`:''}<details><summary>驗證資訊</summary><pre>資料指紋：${esc(row.hash)}\n模型識別：${esc(row.model_id||'尚未評分')}</pre></details>${isAdmin()?`<form id="review-form"><label>覆核結果<select id="review-decision"><option value="pending">待查證</option><option value="confirmed">確認合理</option><option value="rejected">退回修正</option></select></label><label>覆核說明<textarea id="review-note" maxlength="500" required></textarea></label><button>儲存覆核</button></form>`:''}`);
+ if(isAdmin()){$('#review-decision').value=row.review?.decision||'pending';$('#review-note').value=row.review?.note||'';$('#review-form').onsubmit=e=>{e.preventDefault();action(async()=>{const note=$('#review-note').value.trim();if(!note)throw Error('請填寫覆核說明');await api(base()+'/records/'+row.id+'/review',{decision:$('#review-decision').value,note});await render();showDetail(rows.find(r=>r.id===row.id)||row);toast('覆核已儲存');},e.target.querySelector('button'),true);};}
 }
-function tag(row) {return row.anomaly === null ? '<span class="tag muted">尚未評分</span>' : row.anomaly ? '<span class="tag warn">待人工覆核</span>' : '<span class="tag">正常範圍</span>';}
-function table() {
-  const filtered = records.filter(row => (!search || row.supplier.includes(search) || String(row.id).includes(search)) && (state === 'all' || (state === 'anomaly' ? row.anomaly === true : row.anomaly === false)));
-  return `<div class="card"><div class="toolbar"><input id="search" aria-label="搜尋本頁供應商" placeholder="搜尋本頁供應商或編號" value="${escapeHTML(search)}"><select id="filter" aria-label="篩選狀態"><option value="all">全部狀態</option><option value="anomaly" ${state==='anomaly'?'selected':''}>待覆核</option><option value="normal" ${state==='normal'?'selected':''}>正常範圍</option></select><button id="export" class="secondary">匯出所有可見資料</button><small>篩選適用於目前這一頁</small></div><div class="tablewrap"><table><thead><tr><th>編號 / 供應商</th><th>月份</th><th>範疇</th><th>tCO₂e</th><th>產量</th><th>AI 結果</th><th>分數</th><th>操作</th></tr></thead><tbody>${filtered.map(row => `<tr><td>#${row.id} ${escapeHTML(row.supplier)}</td><td>${escapeHTML(row.month)}</td><td>${row.scope}</td><td>${row.emission.toLocaleString()}</td><td>${row.production.toLocaleString()}</td><td>${tag(row)}</td><td>${row.score?.toFixed(4) ?? '—'}</td><td><button class="secondary detail-button" data-id="${row.id}">詳情${user.role==='admin'?' / 覆核':''}</button></td></tr>`).join('') || '<tr><td colspan="8">沒有符合條件的資料</td></tr>'}</tbody></table></div><div class="pager"><span>第 ${total ? offset+1 : 0}–${offset+records.length} 筆 / 共 ${total} 筆</span><button id="previous" class="secondary" ${offset===0?'disabled':''}>上一頁</button><button id="next" class="secondary" ${offset+records.length>=total?'disabled':''}>下一頁</button></div></div>`;
+function time(value){return esc(value?new Date(value).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'');}
+function facilityOptions(list){return '<option value="">請選擇廠別</option>'+list.map(f=>`<option value="${esc(f.controlno)}">${esc(f.controlno)} — ${esc(f.supplier)}</option>`).join('');}
+async function addRecord(){
+ if(period==='annual'){
+  [annualModel,facilities]=await Promise.all([api('/semiconductor/model'),api('/semiconductor/facilities')]);
+  const allowed=facilities.filter(f=>!annualModel.loaded||f.industry===annualModel.industry);
+  openModal('新增年度資料',`<form id="entry-form"><label>廠別管制編號<select name="controlno" required>${facilityOptions(allowed)}</select></label><label>供應商<input name="supplier" readonly required></label><label>行業<input name="industry" readonly required></label><label>年度<input name="year" type="number" min="2000" max="2100" value="${annualModel.train_year?annualModel.train_year+1:2024}" required></label><div class="grid two"><label>直接排放 (tCO₂e)<input name="direct" type="number" min="0" step="any" required></label><label>間接排放 (tCO₂e)<input name="indirect" type="number" min="0" step="any" required></label></div><p id="entry-hint"></p><button>評分並保存</button></form>`);
+  const form=$('#entry-form');form.elements.controlno.onchange=()=>{const f=allowed.find(f=>f.controlno===form.elements.controlno.value);form.elements.supplier.value=f?.supplier||'';form.elements.industry.value=f?.industry||'';};
+  form.querySelector('button').disabled=!allowed.length||!annualModel.loaded;$('#entry-hint').textContent=!annualModel.loaded?'尚無可用年度模型，請聯絡管理員。':!allowed.length?'沒有對應廠別，請聯絡管理員設定帳號所屬廠別。':'';
+ }else{
+  openModal('新增月份資料',`<form id="entry-form"><label>供應商<input name="supplier" maxlength="100" required value="${isAdmin()?'':esc(user.supplier)}" ${isAdmin()?'':'readonly'}></label><label>月份<input name="month" type="month" required></label><label>範疇<select name="scope"><option value="1">範疇一</option><option value="2">範疇二</option><option value="3">範疇三</option></select></label><div class="grid two"><label>排放量 (tCO₂e)<input name="emission" type="number" min="0" step="any" required></label><label>產量<input name="production" type="number" min="0.001" step="any" required></label></div><button>儲存資料</button></form>`);
+ }
+ $('#entry-form').onsubmit=e=>{e.preventDefault();action(async()=>{const row=Object.fromEntries(new FormData(e.target));for(const k of period==='annual'?['year','direct','indirect']:['scope','emission','production'])row[k]=Number(row[k]);await saveRecords([row]);},e.target.querySelector('button'),true);};
 }
-function overview() {
-  const sum = records.reduce((s,r) => s+r.emission,0), flags = records.filter(r=>r.anomaly).length;
-  const months = [...new Set(records.map(r=>r.month))].sort().slice(-6);
-  const values = months.map(m=>records.filter(r=>r.month===m).reduce((s,r)=>s+r.emission,0));
-  const max = Math.max(...values,1);
-  return `<div class="grid stats">${[['可見紀錄總數',total,'筆'],['本頁排放總量',sum.toLocaleString(undefined,{maximumFractionDigits:2}),'tCO₂e'],['本頁待覆核',flags,'筆'],['本頁供應商',new Set(records.map(r=>r.supplier)).size,'家']].map(([label,v,unit])=>`<div class="card stat"><span>${label}</span><strong>${v}</strong><small>${unit}</small></div>`).join('')}</div><div class="card"><h2>月度排放趨勢</h2><small>僅統計目前載入的 ${records.length} 筆資料，非全部資料總量。</small><div class="bars">${months.map((m,i)=>`<div class="barcol"><span>${values[i].toFixed(1)}</span><div class="bar" data-height="${Math.round(values[i]/max*120)}"></div><small>${escapeHTML(m)}</small></div>`).join('') || '<p>新增資料後即可查看趨勢。</p>'}</div></div>` + table();
+async function saveRecords(records){await api(base()+'/records',{records});$('#modal').close();offset=0;await render();toast('資料已保存');}
+async function importData(){
+ if(period==='annual')annualModel=await api('/semiconductor/model');
+ openModal('匯入資料',`<form id="csv-form">${period==='annual'?'<label>評分年度<input id="csv-year" type="number" min="2000" max="2100" value="2024" required></label>':''}<label>CSV 檔案<input id="csv-file" type="file" accept=".csv" required></label><small>${period==='annual'?'使用官方年度資料格式；只匯入目前模型行業與指定年度。':'欄位：supplier,month,scope,emission,production'} 最多 1,000 筆、2 MB。重複匯入會新增紀錄。</small><button>匯入並保存</button></form>`);
+ $('#csv-form').onsubmit=e=>{e.preventDefault();action(async()=>{const data=await readCSV($('#csv-file').files[0],1000);let records;
+  if(period==='annual'){
+   if(!annualModel.loaded)throw Error('請先在模型管理載入年度模型');const year=Number($('#csv-year').value);
+   records=data.filter(r=>{const y=Number(r.app_year);return (y<1911?y+1911:y)===year&&r.ccksicco1===annualModel.industry;}).map(r=>{if(r.check_yn!=='是'||![r.tot1_value,r.tot2_value,r.tot_value].every(v=>typeof v==='string'&&v.trim()))throw Error('請選擇清理後的官方年度 CSV');const direct=Number(r.tot1_value),indirect=Number(r.tot2_value),total=Number(r.tot_value);if(![direct,indirect,total].every(Number.isFinite)||Math.abs(direct+indirect-total)>.002)throw Error('排放數值或合計不一致');return {supplier:r.companyname,controlno:r.controlno,industry:r.ccksicco1,year,direct,indirect};});
+  }else records=data.map(r=>({supplier:r.supplier,month:r.month,scope:Number(r.scope),emission:r.emission?.trim()?Number(r.emission):NaN,production:r.production?.trim()?Number(r.production):NaN}));
+  if(!records.length)throw Error('沒有符合條件的資料');if(!confirm(`即將新增 ${records.length} 筆紀錄，是否繼續？`))return;await saveRecords(records);
+ },e.target.querySelector('button'),true);};
 }
-function render() {
-  $('#page-title').textContent = titles[page];
-  document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
-  $('#model-banner').hidden = model.trained;
-  $('#model-banner').textContent = model.trained ? '' : '尚未設定模型，資料將暫不評分。';
-  let html = '';
-  if (page === 'overview') html = overview();
-  if (page === 'records') html = table();
-  if (page === 'ai') html = `<div class="grid two"><div class="card"><h2>Isolation Forest 模型</h2><p>200 棵隔離樹；特徵包含排放量、產量、排放強度及範疇。分數越高代表越離群，並非錯誤機率。請使用相同產品及可比較單位的參考資料。</p><pre>${escapeHTML(JSON.stringify(model,null,2))}</pre></div><div class="card">${user.role==='admin'?`<h2>訓練模型</h2><p>匯入已確認的參考 CSV（32–10,000 筆，2 MB 以內）。資料格式與排放匯入相同；訓練不會新增排放紀錄。</p><label>預期離群比例<input id="contamination" type="number" value="0.05" min="0.001" max="0.5" step="0.001"></label><label>訓練備註<textarea id="training-note" maxlength="500" placeholder="例如：2026 年已核對的同產品歷史資料"></textarea></label><input id="train-file" type="file" accept=".csv,text/csv" aria-label="訓練資料 CSV"><button id="train-button">上傳並訓練</button><p id="train-status" role="status"></p>`:'<h2>模型管理權限</h2><p>模型訓練由管理員執行。你可以上傳所屬供應商資料並查看模型評分。</p>'}</div></div>` + table();
-  if (page === 'integrity') html = `<div class="card"><h2>內容指紋與鏈結驗證</h2><p>每筆排放紀錄及稽核事件建立 SHA-256 鏈，並以伺服器密鑰產生 HMAC。修改內容、插入紀錄或重寫指紋會造成驗證失敗。</p><button id="verify">立即驗證全部紀錄</button><pre id="verification">尚未執行驗證</pre></div><div class="notice">尾端刪除、整庫回滾需要外部可信錨點偵測。請執行 checkpoint 指令，將筆數及鏈頭保存到獨立的不可改寫儲存。</div>`;
-  if (page === 'security') html = `<div class="grid two"><div class="card"><h2>已實作的應用層控制</h2><p>PBKDF2 密碼雜湊、HttpOnly / SameSite Cookie、CSRF Token、供應商存取隔離、管理員權限、登入節流、請求大小限制、參數化 SQL 及安全標頭。</p></div><div class="card"><h2>部署環境需配置</h2><p>HTTPS、WAF、集中式限流、SSO / MFA、備份、金鑰管理、外部稽核錨點與監控。本專案採單程序 SQLite，不支援多 Worker 同時共享模型。</p></div></div><div class="card"><div class="heading"><h2>最近 200 筆稽核事件</h2><button id="load-audit" class="secondary">讀取稽核</button></div><div id="audit-output"></div></div>`;
-  $('#content').innerHTML = html; document.querySelectorAll('.bar').forEach(el=>el.style.height=el.dataset.height+'px'); bind();
+function parseCSV(text){const rows=[];let row=[],v='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){v+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){row.push(v);v='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v='';}else v+=c;}if(quoted)throw Error('CSV 引號未閉合');row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows;}
+async function readCSV(file,max){if(!file||file.size>2*1024*1024)throw Error('請選擇 2 MB 以內 CSV');const data=parseCSV((await file.text()).replace(/^\uFEFF/,'')),header=data.shift()?.map(s=>s.trim());if(!header||new Set(header).size!==header.length||!data.length||data.length>max)throw Error('CSV 欄位或筆數不正確');return data.map((r,i)=>{if(r.length!==header.length)throw Error(`第 ${i+2} 列欄位數錯誤`);return Object.fromEntries(header.map((k,j)=>[k,r[j]]));});}
+async function exportPage(){const exported=[];for(let start=0;;start+=100){const data=await api(base()+'/records?offset='+start+'&limit=100');exported.push(...data.records);if(!data.records.length||exported.length>=data.total)break;}const fields=period==='annual'?['id','supplier','controlno','industry','year','direct','indirect','total','score','anomaly','model_id','hash']:['id','supplier','month','scope','emission','production','score','anomaly','model_id','hash'];const cell=v=>{let s=String(v??'');if(s.trimStart().match(/^[=+@\-]/)||/^[\t\r\n]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};const text=fields.join(',')+'\n'+exported.map(r=>fields.map(k=>cell(r[k])).join(',')).join('\n');const url=URL.createObjectURL(new Blob(['\uFEFF',text],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=period+'-records.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function bindPage(){
+ if($('#search'))$('#search').oninput=e=>{query=e.target.value;drawRows();};if($('#filter'))$('#filter').onchange=e=>{filter=e.target.value;drawRows();};if($('#export'))$('#export').onclick=e=>action(exportPage,e.target);
+ for(const [id,delta]of[['prev',-20],['next',20]])if($('#'+id))$('#'+id).onclick=e=>action(async()=>{offset+=delta;await render();},e.target);
+ if($('#model-import'))$('#model-import').onsubmit=e=>{e.preventDefault();action(async()=>{const f=$('#model-file').files[0];if(!f||f.size>2*1024*1024)throw Error('請選擇2 MB以內JSON');await api('/semiconductor/model/import',JSON.parse(await f.text()));await render();toast('模型已載入');},e.target.querySelector('button'));};
+ if($('#model-train'))$('#model-train').onsubmit=e=>{e.preventDefault();action(async()=>{const data=await readCSV($('#train-file').files[0],10000);if(data.length<32)throw Error('至少需要32筆');const samples=data.map(r=>({supplier:r.supplier,month:r.month,scope:Number(r.scope),emission:r.emission?.trim()?Number(r.emission):NaN,production:r.production?.trim()?Number(r.production):NaN}));await api('/model/train',{samples,contamination:Number($('#contamination').value),note:$('#training-note').value.trim()});await render();toast('模型訓練完成');},e.target.querySelector('button'));};
+ if($('#verify'))$('#verify').onclick=e=>action(async()=>{const result=await api('/integrity'),labels={records:'月份紀錄',semiconductor_records:'年度紀錄',audit:'操作紀錄'};$('#verification').innerHTML='<table><thead><tr><th>資料</th><th>筆數</th><th>驗證結果</th></tr></thead><tbody>'+Object.entries(result).map(([k,r])=>`<tr><td>${labels[k]||esc(k)}</td><td>${r.count}</td><td><span class="tag ${r.valid?'':'warn'}">${r.valid?'驗證通過':'發現不一致'}</span>${r.invalid_ids.length?' #'+r.invalid_ids.join(', '):''}</td></tr>`).join('')+'</tbody></table><small>驗證內容與鏈結一致性；尾端刪除及整庫回滾仍需外部保存的鏈頭比對。</small>';},e.target);
+ if($('#binding-user'))$('#binding-user').onchange=()=>{const option=$('#binding-user').selectedOptions[0],supplier=option?.dataset.supplier;$('#binding-current').textContent=supplier?'目前綁定：'+supplier:'';$('#binding-facility').value=facilities.find(f=>f.supplier===supplier)?.controlno||'';};
+ if($('#binding-form'))$('#binding-form').onsubmit=e=>{e.preventDefault();action(async()=>{const username=$('#binding-user').value,controlno=$('#binding-facility').value;if(!username||!controlno)throw Error('請選擇帳號與廠別');if(!confirm('儲存後會變更此帳號可存取的資料，並使該帳號登出。確定繼續？'))return;await api('/semiconductor/supplier-binding',{username,controlno});await render();toast('綁定已儲存，請供應商重新登入');},e.target.querySelector('button'));};
+ if($('#load-audit'))$('#load-audit').onclick=e=>action(async()=>{const logs=await api('/audit'),labels={login:'登入',upload:'月份資料上傳',train:'月份模型訓練',review:'月份資料覆核',semiconductor_model_import:'年度模型載入',semiconductor_upload:'年度資料上傳',semiconductor_review:'年度資料覆核',supplier_binding:'帳號廠別綁定'};$('#audit-output').innerHTML='<div class="tablewrap"><table><thead><tr><th>時間</th><th>操作者</th><th>操作</th><th>內容</th></tr></thead><tbody>'+logs.map(r=>`<tr><td>${time(r.time)}</td><td>${esc(r.user)}</td><td>${labels[r.action]||esc(r.action)}</td><td>${esc(auditSummary(r))}</td></tr>`).join('')+'</tbody></table></div>';},e.target);
 }
-function bind() {
-  if ($('#search')) $('#search').oninput = e => { search=e.target.value;const p=e.target.selectionStart;render();$('#search').focus();$('#search').setSelectionRange(p,p); };
-  if ($('#filter')) $('#filter').onchange = e => { state=e.target.value;render(); };
-  for (const [id,delta] of [['previous',-100],['next',100]]) if ($('#'+id)) $('#'+id).onclick=async()=>{offset+=delta;try{await refresh();}catch(e){toast(e.message);}};
-  if ($('#export')) $('#export').onclick=async()=>{try{const blob=await api('/export');const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='carbon-records.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){toast(e.message);}};
-  document.querySelectorAll('.detail-button').forEach(button=>button.onclick=async()=>{
-    const row=records.find(r=>r.id===Number(button.dataset.id));
-    if (user.role!=='admin') {alert(JSON.stringify(row,null,2));return;}
-    const decision=prompt(`紀錄 #${row.id}\nSHA-256: ${row.hash}\n模型: ${row.model_id ?? '未評分'}\n\n輸入覆核結果：confirmed（確認合理）、rejected（退回）、pending（待查）\n取消可關閉。`);
-    if(decision===null)return;
-    if(!['confirmed','rejected','pending'].includes(decision)){toast('覆核結果格式不正確');return;}
-    const note=prompt('請輸入覆核原因（1–500 字元）');if(!note)return;
-    try{await api(`/records/${row.id}/review`,{method:'POST',body:JSON.stringify({decision,note})});toast('已追加覆核事件，可於稽核頁查閱；原始資料保留。');}catch(e){toast(e.message);}
-  });
-  if ($('#verify')) $('#verify').onclick=async()=>{try{$('#verification').textContent=JSON.stringify(await api('/integrity'),null,2);}catch(e){toast(e.message);}};
-  if ($('#load-audit')) $('#load-audit').onclick=async()=>{try{const rows=await api('/audit');$('#audit-output').innerHTML=`<div class="tablewrap"><table><thead><tr><th>時間</th><th>操作者</th><th>事件</th><th>內容</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${escapeHTML(r.time)}</td><td>${escapeHTML(r.user)}</td><td>${escapeHTML(r.action)}</td><td>${escapeHTML(JSON.stringify(r.detail))}</td></tr>`).join('')}</tbody></table></div>`;}catch(e){toast(e.message);}};
-  if ($('#train-button')) $('#train-button').onclick=async()=>{
-    const button=$('#train-button');button.disabled=true;
-    try{const samples=await csvFile($('#train-file').files[0],10000);if(samples.length<32)throw Error('至少需要 32 筆參考資料');const contamination=Number($('#contamination').value),note=$('#training-note').value.trim();if(!note)throw Error('請填寫訓練備註');$('#train-status').textContent='訓練中，請稍候…';await api('/model/train',{method:'POST',body:JSON.stringify({samples,contamination,note})});await refresh();toast('模型已訓練並保存參考資料');}catch(e){toast(e.message);if($('#train-status'))$('#train-status').textContent=e.message;}finally{button.disabled=false;}
-  };
-}
-function parseCSV(text) {
-  const rows=[];let row=[],value='',quoted=false;
-  for(let i=0;i<text.length;i++){const ch=text[i];if(ch==='"'){if(quoted&&text[i+1]==='"'){value+='"';i++;}else quoted=!quoted;}else if(ch===','&&!quoted){row.push(value);value='';}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(value);if(row.some(v=>v.trim()))rows.push(row);row=[];value='';}else value+=ch;}
-  if(quoted)throw Error('CSV 引號未閉合');row.push(value);if(row.some(v=>v.trim()))rows.push(row);return rows;
-}
-async function csvFile(file,max) {
-  if(!file)throw Error('請先選擇 CSV');if(file.size>2*1024*1024)throw Error('CSV 不可超過 2 MB');
-  const rows=parseCSV((await file.text()).replace(/^\uFEFF/,'')),head=rows.shift()?.map(v=>v.trim());
-  if(JSON.stringify(head)!==JSON.stringify(['supplier','month','scope','emission','production']))throw Error('CSV 欄位須依序為 supplier,month,scope,emission,production');
-  if(!rows.length||rows.length>max)throw Error(`需提供 1–${max} 筆資料`);
-  return rows.map((r,i)=>{if(r.length!==5||r.some(v=>!v.trim()))throw Error(`第 ${i+2} 列欄位錯誤`);const result={supplier:r[0].trim(),month:r[1].trim(),scope:Number(r[2]),emission:Number(r[3]),production:Number(r[4])};if(![result.scope,result.emission,result.production].every(Number.isFinite))throw Error(`第 ${i+2} 列數值無效`);return result;});
-}
-$('#login-form').onsubmit=async event=>{event.preventDefault();const form=new FormData(event.target),button=event.target.querySelector('button');button.disabled=true;$('#login-error').textContent='';try{user=await api('/login',{method:'POST',body:JSON.stringify(Object.fromEntries(form))});event.target.reset();await enter();}catch(e){$('#login-error').textContent=e.message;}finally{button.disabled=false;}};
-$('#logout').onclick=async()=>{try{await api('/logout',{method:'POST'});showLogin();}catch(e){toast(e.message);}};
-document.querySelectorAll('[data-page]').forEach(button=>button.onclick=async()=>{page=button.dataset.page;search='';state='all';try{await refresh();}catch(e){toast(e.message);}});
-$('#open-upload').onclick=()=>{const form=$('#record-form');form.reset();form.elements.supplier.readOnly=user.role!=='admin';form.elements.supplier.value=user.role==='admin'?'':user.supplier;form.elements.month.value=(()=>{const p=new Intl.DateTimeFormat('en',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit'}).formatToParts(new Date());return p.find(x=>x.type==='year').value+'-'+p.find(x=>x.type==='month').value;})();$('#upload-message').textContent='';$('#upload-dialog').showModal();};
-$('#close-dialog').onclick=()=>$('#upload-dialog').close();
-async function saveRows(rows){await api('/records',{method:'POST',body:JSON.stringify({records:rows})});$('#upload-dialog').close();offset=0;await refresh();toast('已保存資料、雜湊與模型評分');}
-$('#record-form').onsubmit=async event=>{event.preventDefault();const button=event.target.querySelector('button:not([type="button"])');button.disabled=true;try{const values=Object.fromEntries(new FormData(event.target));for(const name of ['scope','emission','production'])values[name]=Number(values[name]);await saveRows([values]);}catch(e){$('#upload-message').textContent=e.message;}finally{button.disabled=false;}};
-$('#upload-csv').onchange=async event=>{const input=event.target;input.disabled=true;try{await saveRows(await csvFile(input.files[0],1000));}catch(e){$('#upload-message').textContent=e.message;}finally{input.disabled=false;input.value='';}};
+function auditSummary(r){const d=r.detail||{};if(r.action==='supplier_binding')return d.username+' → '+d.supplier;if(d.record_id)return '#'+d.record_id+' · '+({confirmed:'確認合理',rejected:'退回修正',pending:'待查證'}[d.decision]||'')+' · '+(d.note||'');if(d.record_ids||d.ids)return (d.record_ids||d.ids).length+' 筆';return d.note||'';}
+$('#modal-close').onclick=()=>$('#modal').close();$('#add-record').onclick=e=>action(addRecord,e.target);$('#import-data').onclick=e=>action(importData,e.target);
+$('#login-form').onsubmit=e=>{e.preventDefault();$('#login-error').textContent='';const button=e.target.querySelector('button');button.disabled=true;(async()=>{try{user=await api('/login',Object.fromEntries(new FormData(e.target)));e.target.reset();await enter();}catch(err){$('#login-error').textContent=err.message;}finally{button.disabled=false;}})();};
+$('#logout').onclick=()=>action(async()=>{await api('/logout',{});showLogin();});
+document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>action(async()=>{if(!isAdmin()&&b.dataset.page!=='records')return;page=b.dataset.page;query='';filter='all';offset=0;await render();}));
+document.querySelectorAll('[data-period]').forEach(b=>b.onclick=()=>action(async()=>{period=b.dataset.period;query='';filter='all';offset=0;await render();}));
 (async()=>{try{user=await api('/me');await enter();}catch{showLogin();}})();
