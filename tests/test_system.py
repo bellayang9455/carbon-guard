@@ -7,6 +7,9 @@ TEST_DATA = tempfile.TemporaryDirectory()
 os.environ['CARBON_DATA_DIR'] = TEST_DATA.name
 os.environ['CARBON_SECRET'] = 'testing-only-secret-' * 4
 os.environ['CARBON_SECURE_COOKIE'] = 'false'
+os.environ['DATABASE_URL'] = ''
+os.environ.pop('BOOTSTRAP_ADMIN_USERNAME',None)
+os.environ.pop('BOOTSTRAP_ADMIN_PASSWORD',None)
 from fastapi.testclient import TestClient
 from backend.main import app, attempts
 from backend.database import connect

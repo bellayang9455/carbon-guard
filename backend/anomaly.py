@@ -38,7 +38,7 @@ def activate(candidate, document):
 
 def restore():
     with connect() as db:
-        row = db.execute('SELECT payload,mac FROM models ORDER BY rowid DESC LIMIT 1').fetchone()
+        row = db.execute('SELECT payload,mac FROM models ORDER BY saved_order DESC,id DESC LIMIT 1').fetchone()
     if row:
         if not hmac.compare_digest(row['mac'], signature('model:' + row['payload'])):
             raise RuntimeError('模型參考資料驗證失敗')

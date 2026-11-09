@@ -1,5 +1,5 @@
 """年度半導體模型整合；使用 annual_model.py 產生的參考 JSON。"""
-import hashlib,hmac,json,math,threading
+import hashlib,hmac,json,math,threading,time
 from datetime import datetime,timezone
 from pathlib import Path
 import sklearn
@@ -65,7 +65,7 @@ def build(value):
 
 def load_saved():
     global model,document,model_id
-    with connect() as db:row=db.execute('SELECT * FROM semiconductor_models ORDER BY rowid DESC LIMIT 1').fetchone()
+    with connect() as db:row=db.execute('SELECT * FROM semiconductor_models ORDER BY saved_order DESC,id DESC LIMIT 1').fetchone()
     if row:
         if not hmac.compare_digest(row['mac'],signature('semiconductor-model:'+row['payload'])):raise RuntimeError('半導體模型 HMAC 不一致')
         value=ModelImport.model_validate_json(row['payload'])
@@ -99,7 +99,7 @@ def import_model(value:ModelImport,user=Depends(current_user)):
     with lock:
         with connect() as db:
             db.execute('BEGIN IMMEDIATE');ensure_valid(db)
-            db.execute('INSERT OR IGNORE INTO semiconductor_models VALUES (?,?,?)',(identifier,payload,signature('semiconductor-model:'+payload)))
+            db.execute('INSERT INTO semiconductor_models(id,payload,mac,saved_order) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET saved_order=excluded.saved_order',(identifier,payload,signature('semiconductor-model:'+payload),time.time_ns()))
             event(db,user['username'],'semiconductor_model_import',dict(model_id=identifier,train_year=value.train_year,industry=value.industry))
         model=candidate;document=value.model_dump();model_id=identifier
     return status(user)

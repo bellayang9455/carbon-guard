@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from . import anomaly, semiconductor
 from .config import ROOT, SECURE_COOKIE
-from .database import connect, initialize
+from .database import connect, initialize, bootstrap_admin
 from .integrity import append, verify, ensure_valid, canonical, signature
 from .schemas import Login, Record, Batch, Train, Review
 from .security import current_user, admin, check_password, token_hash, SESSION_SECONDS
@@ -25,6 +25,7 @@ attempts = {}
 @asynccontextmanager
 async def lifespan(app):
     initialize()
+    bootstrap_admin()
     anomaly.restore()
     semiconductor.initialize()
     yield
@@ -195,8 +196,8 @@ def train(body: Train, user=Depends(current_user)):
             with connect() as db:
                 db.execute('BEGIN IMMEDIATE')
                 ensure_valid(db)
-                db.execute('INSERT INTO models VALUES (?,?,?)',
-                           (document['id'], payload, signature('model:' + payload)))
+                db.execute('INSERT INTO models(id,payload,mac,saved_order) VALUES (?,?,?,?)',
+                           (document['id'], payload, signature('model:' + payload), time.time_ns()))
                 audit(db, user['username'], 'train', {
                     'model_id': document['id'], 'samples': len(body.samples), 'note': body.note})
             anomaly.activate(candidate, document)

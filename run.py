@@ -11,8 +11,12 @@ if (root / '.env').exists():
             key, value = line.split('=', 1)
             os.environ.setdefault(key.strip(), value.strip())
 if len(sys.argv) > 1:
-    sys.argv = ['backend.manage', *sys.argv[1:]]
-    runpy.run_module('backend.manage', run_name='__main__')
+    if sys.argv[1] == 'migrate-postgres':
+        sys.argv = ['backend.migrate_postgres', *sys.argv[2:]]
+        runpy.run_module('backend.migrate_postgres', run_name='__main__')
+    else:
+        sys.argv = ['backend.manage', *sys.argv[1:]]
+        runpy.run_module('backend.manage', run_name='__main__')
 else:
     import uvicorn
     uvicorn.run('backend.main:app', host=os.getenv('CARBON_HOST', '127.0.0.1'),

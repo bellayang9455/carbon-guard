@@ -3,7 +3,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = Path(os.getenv('CARBON_DATA_DIR', str(ROOT / 'data')))
-DATA.mkdir(parents=True, exist_ok=True)
+DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
+if DATABASE_URL and not DATABASE_URL.startswith(('postgresql://','postgres://')):
+    raise RuntimeError('DATABASE_URL 必須是 PostgreSQL 連線網址')
+if not DATABASE_URL:
+    DATA.mkdir(parents=True, exist_ok=True)
 DB = DATA / 'carbon.sqlite3'
 SECRET = os.getenv('CARBON_SECRET', '')
 if len(SECRET) < 32:
